@@ -19,7 +19,8 @@ $(window).resize(function() {
 	$.fn.typewriter = function() {
 		this.each(function() {
 			var $ele = $(this), str = $ele.html(), progress = 0;
-			$ele.html('');
+			var caret = '<span class="typing-caret">_</span>';
+			$ele.html(caret);
 			var timer = setInterval(function() {
 				var current = str.substr(progress, 1);
 				if (current == '<') {
@@ -27,7 +28,7 @@ $(window).resize(function() {
 				} else {
 					progress++;
 				}
-				$ele.html(str.substring(0, progress) + (progress & 1 ? '_' : ''));
+				$ele.html(str.substring(0, progress) + (progress >= str.length ? '' : caret));
 				if (progress >= str.length) {
 					clearInterval(timer);
 				}

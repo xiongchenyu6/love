@@ -110,6 +110,13 @@ a:hover {
 .say   { margin-left: 5px; }
 .space { margin-right: 150px; }
 
+.typing-caret {
+  display: inline-block;
+  width: 0.65em;
+  color: inherit;
+  vertical-align: baseline;
+}
+
 @media (max-width: 720px) {
   body {
     min-height: 100%;
@@ -151,13 +158,14 @@ a:hover {
     top: auto;
     width: min(100%, 520px);
     height: auto;
+    min-height: clamp(460px, 132vw, 620px);
     margin: 0 auto;
   }
 
   #code {
     font-size: 15px;
     line-height: 1.7;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   #clock-box {
