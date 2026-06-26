@@ -1,0 +1,195 @@
+/* ── Breathing pulse for clock digits ── */
+@keyframes heartbeat {
+  0%,  100% { opacity: 1;    transform: scale(1); }
+  50%        { opacity: 0.78; transform: scale(1.04); }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #fff0f5 0%, #fff8f0 50%, #ffffe0 100%);
+  font-size: 14px;
+  font-family: -apple-system, "PingFang SC", "Segoe UI", "Helvetica Neue",
+               '微软雅黑', '宋体', sans-serif;
+  color: #231F20;
+  overflow: auto;
+}
+
+html {
+  min-height: 100%;
+}
+
+a {
+  color: #c0627a;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: #a04060;
+}
+
+#main { width: 100%; }
+
+/* Keep exact canvas dimensions — JS reads these */
+#wrap {
+  position: relative;
+  margin: 0 auto;
+  width: 1100px;
+  height: 680px;
+  margin-top: 10px;
+}
+
+#text {
+  width: 400px;
+  height: 425px;
+  left: 60px;
+  top: 80px;
+  position: absolute;
+  text-shadow: 0 1px 6px rgba(200, 80, 100, 0.12),
+               0 0 2px rgba(255, 200, 210, 0.18);
+}
+
+/* JS toggles this visible; keep display:none */
+#code {
+  display: none;
+  font-size: 16px;
+  text-shadow: 0 1px 6px rgba(200, 80, 100, 0.12);
+}
+
+/* JS toggles this visible; keep display:none */
+#clock-box {
+  position: absolute;
+  left: 60px;
+  top: 550px;
+  font-size: 28px;
+  display: none;
+  color: #c0627a;
+  text-shadow: 0 1px 8px rgba(192, 98, 122, 0.25);
+}
+
+#clock-box a {
+  font-size: 28px;
+  text-decoration: none;
+  color: #c0627a;
+}
+
+#clock { margin-left: 48px; }
+
+#clock .digit {
+  font-size: 64px;
+
+  /* Warm rose gradient text — background-clip approach */
+  background: linear-gradient(160deg, #e8405a 0%, #f0856a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  /* Solid-color fallback for browsers that don't support background-clip:text */
+  color: #e04060;
+
+  display: inline-block;
+  animation: heartbeat 3.6s ease-in-out infinite;
+}
+
+#canvas {
+  margin: 0 auto;
+  width: 1100px;
+  height: 680px;
+  touch-action: manipulation;
+}
+
+#error {
+  margin: 0 auto;
+  text-align: center;
+  margin-top: 60px;
+  display: none;
+}
+
+.hand  { cursor: pointer; }
+.say   { margin-left: 5px; }
+.space { margin-right: 150px; }
+
+@media (max-width: 720px) {
+  body {
+    min-height: 100%;
+    overflow-x: hidden;
+    font-size: 15px;
+  }
+
+  #main {
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  #wrap {
+    width: 100%;
+    min-height: 100svh;
+    height: auto;
+    margin: 0;
+    padding: min(420px, 84vw) 18px 32px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  #canvas {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 135vw;
+    max-width: 760px;
+    height: auto;
+    aspect-ratio: 1100 / 680;
+    margin: 0;
+    transform: translateX(-50%);
+  }
+
+  #text {
+    position: relative;
+    z-index: 2;
+    left: auto;
+    top: auto;
+    width: min(100%, 520px);
+    height: auto;
+    margin: 0 auto;
+  }
+
+  #code {
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  #clock-box {
+    position: relative;
+    z-index: 2;
+    left: auto;
+    top: auto;
+    width: min(100%, 520px);
+    margin: 24px auto 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  #clock-box a {
+    font-size: inherit;
+  }
+
+  #clock {
+    margin-left: 0;
+    margin-top: 4px;
+    line-height: 1.9;
+  }
+
+  #clock .digit {
+    font-size: clamp(26px, 9vw, 42px);
+  }
+
+  .say {
+    margin-left: 0;
+  }
+
+  .space {
+    margin-right: 0;
+  }
+}
