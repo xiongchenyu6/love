@@ -117,7 +117,13 @@ a:hover {
   vertical-align: baseline;
 }
 
-/* ── Mobile: vertical stack — canvas hero on top, letter + clock below ── */
+/* ── Mobile: simple vertical document flow ──────────────────
+   The canvas is the first child of #wrap (see index.html), so it
+   stacks on top by plain flow — no flex/order tricks. The letter and
+   clock follow below. The canvas is overscanned to 150% width and
+   centered (sides clipped) so the centred tree art reads large; the
+   post-bloom snapshot background is given the same 150% size so the
+   floating petals stay aligned with the frozen tree. */
 @media (max-width: 720px) {
   body {
     overflow-x: hidden;
@@ -135,28 +141,26 @@ a:hover {
     width: 100%;
     height: auto;
     margin: 0;
-    padding: 0 0 36px;
+    padding: 0 0 40px;
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
+    overflow: hidden;                 /* clip the overscanned canvas sides */
     transform: none !important;
-    /* The post-bloom tree snapshot (set inline by JS) is pinned full-bleed
-       to the top so it lines up exactly with the hero-banner canvas. */
     background-repeat: no-repeat !important;
-    background-position: top center !important;
-    background-size: 100% auto !important;
+    /* Right-align the frozen tree: the heart blooms in the canvas's right
+       half, so anchoring right keeps it large and complete while only the
+       sparse (near-empty) left edge is clipped. */
+    background-position: top right !important;
+    background-size: 130% auto !important;
   }
 
-  /* Canvas becomes the full-bleed top hero banner regardless of DOM order */
   #canvas {
-    order: -1;
-    position: static;
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    aspect-ratio: 1100 / 680;
-    margin: 0 0 14px;
+    display: block;
+    position: relative;
+    width: 130%;
+    height: auto;                     /* keeps the 1100:680 aspect ratio */
+    left: -30%;                       /* right-align to frame the heart */
     transform: none;
+    margin: 0 0 14px;
   }
 
   #text {
@@ -166,7 +170,7 @@ a:hover {
     width: 100%;
     height: auto;
     margin: 0;
-    padding: 0 18px;
+    padding: 0 20px;
     box-sizing: border-box;
   }
 
@@ -182,7 +186,7 @@ a:hover {
     top: auto;
     width: 100%;
     margin: 20px 0 0;
-    padding: 0 18px;
+    padding: 0 20px;
     box-sizing: border-box;
     font-size: 16px;
     line-height: 1.7;
