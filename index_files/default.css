@@ -1,9 +1,3 @@
-/* ── Breathing pulse for clock digits ── */
-@keyframes heartbeat {
-  0%,  100% { opacity: 1;    transform: scale(1); }
-  50%        { opacity: 0.78; transform: scale(1.04); }
-}
-
 body {
   margin: 0;
   padding: 0;
@@ -29,7 +23,31 @@ a:hover {
   color: #a04060;
 }
 
-#main { width: 100%; }
+/* Desktop: vertically + horizontally centre the fixed stage so the empty
+   space is balanced top/bottom instead of dumped below. */
+#main {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;        /* clip the scaled stage's layout-box overflow */
+  position: relative;
+  z-index: 1;              /* sit above the floating-petal field */
+}
+
+/* Full-viewport ambient petal field (anime.js spawns hearts into this) */
+#petals {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.petal { position: absolute; will-change: transform, opacity; user-select: none; }
+.beat  { display: inline-block; will-change: transform; }
 
 /* Keep exact canvas dimensions — JS reads these */
 #wrap {
@@ -37,7 +55,6 @@ a:hover {
   margin: 0 auto;
   width: 1100px;
   height: 680px;
-  margin-top: 10px;
 }
 
 #text {
@@ -88,8 +105,7 @@ a:hover {
   /* Solid-color fallback for browsers that don't support background-clip:text */
   color: #e04060;
 
-  display: inline-block;
-  animation: heartbeat 3.6s ease-in-out infinite;
+  display: inline-block;        /* anime.js pops the seconds digit each tick */
 }
 
 #canvas {
@@ -130,10 +146,12 @@ a:hover {
     font-size: 15px;
   }
 
-  /* Override the inline transform/height JS applies for desktop scaling */
+  /* Override the desktop flex-centering + the inline transform/height JS sets */
   #main {
     width: 100%;
     height: auto !important;
+    min-height: 0 !important;
+    display: block !important;
     overflow: visible !important;
   }
 

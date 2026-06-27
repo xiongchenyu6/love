@@ -58,30 +58,26 @@ function timeElapse(date) {
 
 // ── Responsive fit ──────────────────────────────────────────
 // The canvas art is authored at a fixed 1100x680 logical size.
-// On phones (<=720px) the stylesheet restacks the layout, so we
-// leave the DOM untouched. On in-between widths we scale the whole
-// #wrap down proportionally so nothing overflows or gets clipped.
+// On phones (<=720px) the stylesheet restacks the layout, so we leave the
+// DOM untouched. On larger screens #main flex-centres the stage; here we
+// just scale #wrap to fit both the viewport width and height (centred), so
+// it never overflows on narrow/short windows.
 function fitWrap() {
     var wrap = document.getElementById('wrap');
-    var main = document.getElementById('main');
-    if (!wrap || !main) { return; }
+    if (!wrap) { return; }
 
     var vw = document.documentElement.clientWidth;
+    var vh = document.documentElement.clientHeight;
 
     if (vw <= 720) {
         wrap.style.transform = '';
         wrap.style.transformOrigin = '';
-        main.style.height = '';
-        main.style.overflow = '';
         return;
     }
 
-    var scale = Math.min(1, vw / 1120); // 1120 leaves a little breathing room
-    wrap.style.transformOrigin = 'top center';
+    var scale = Math.min(1, (vw - 24) / 1100, (vh - 24) / 680);
+    wrap.style.transformOrigin = 'center center';
     wrap.style.transform = 'scale(' + scale + ')';
-    // Collapse the empty space the un-transformed layout box would leave.
-    main.style.height = Math.ceil(690 * scale) + 'px';
-    main.style.overflow = 'hidden';
 }
 
 window.addEventListener('resize', fitWrap);

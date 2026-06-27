@@ -18,6 +18,7 @@
 			<audio autoplay="autopaly">
 					<source src="do_you.mp3" type="audio/mp3" />
 			</audio>
+        <div id="petals"></div>
         <div id="main">
             <div id="error"><br><br><br><br><br><br>你的浏览器太旧啦，看不到这份小惊喜～<br>请用 <a href="http://www.google.cn/chrome/intl/zh-CN/landing_chrome.html?hl=zh-CN&brand=CHMI">Chrome</a> 或 <a href="http://firefox.com.cn/download/">Firefox</a> 打开本页面哦<br><br>—— 你永远的朋友 Freeman</div>
              <div id="wrap">
@@ -221,25 +222,92 @@
             }
         }
 
+        // ── Ambient petal field (anime.js) — fills the empty viewport space
+        // around the centred stage with hearts drifting gently upward.
+        var PETAL_COLORS = ['#e84a6f', '#ff7aa8', '#ffb3c6', '#ff5d8f',
+                            '#ffd166', '#ff9a5a', '#f0856a'];
+
+        function spawnPetal(petals) {
+            var el = document.createElement('div');
+            el.className = 'petal';
+            el.textContent = '❤';
+            el.style.left = anime.random(0, 100) + 'vw';
+            el.style.top = '102vh';
+            el.style.fontSize = anime.random(9, 22) + 'px';
+            el.style.color = PETAL_COLORS[anime.random(0, PETAL_COLORS.length - 1)];
+            el.style.opacity = 0;
+            petals.appendChild(el);
+            anime({
+                targets: el,
+                translateY: -(window.innerHeight + 140),
+                translateX: anime.random(-80, 80),
+                rotate: anime.random(-120, 120),
+                opacity: [
+                    { value: anime.random(35, 75) / 100, duration: 800 },
+                    { value: 0, duration: 1400, delay: anime.random(2500, 4500) }
+                ],
+                duration: anime.random(7000, 12000),
+                easing: 'easeInOutSine',
+                complete: function () { el.remove(); }
+            });
+        }
+
+        function startPetals() {
+            var petals = document.getElementById('petals');
+            if (!petals || !window.anime) { return; }
+            for (var i = 0; i < 6; i++) { spawnPetal(petals); }
+            setInterval(function () {
+                if (!document.hidden) { spawnPetal(petals); }
+            }, 850);
+        }
+
+        // Make the ❤ inside the letter pulse like a heartbeat.
+        function beatHeart(code) {
+            if (!window.anime) { return; }
+            code.innerHTML = code.innerHTML.replace('❤',
+                '<span class="beat">❤</span>');
+            var beat = code.querySelector('.beat');
+            if (beat) {
+                anime({ targets: beat, scale: [1, 1.35], duration: 600,
+                        direction: 'alternate', loop: true, easing: 'easeInOutSine' });
+            }
+        }
+
+        // Pop the seconds digit on each tick.
+        function popSeconds() {
+            if (!window.anime) { return; }
+            var digits = document.querySelectorAll('#clock .digit');
+            var sec = digits[digits.length - 1];
+            if (sec) {
+                anime({ targets: sec, scale: [1.3, 1], duration: 420, easing: 'easeOutQuad' });
+            }
+        }
+
         async function textAnimate() {
             var together = new Date("2023/12/9 00:00:00");
             var code = document.getElementById('code');
             fadeIn(code);
             await typewriter(code, { speed: 28 });
+            beatHeart(code);
 
             var clockBox = document.getElementById('clock-box');
             fadeIn(clockBox, { translateY: [12, 0], duration: 600 });
             timeElapse(together);
-            setInterval(function () { timeElapse(together); }, 1000);
+            popSeconds();
+            setInterval(function () { timeElapse(together); popSeconds(); }, 1000);
         }
 
         async function run() {
+            if (window.anime) {
+                anime({ targets: '#wrap', opacity: [0, 1], duration: 900, easing: 'easeOutQuad' });
+            }
             await seedAnimate();
             await growAnimate();
             await flowAnimate();
             await moveAnimate();
             textAnimate();   // typewriter + clock (self-driving)
-            jumpAnimate();   // endless floating petals
+            jumpAnimate();   // endless floating petals on the canvas
+            startPetals();   // ambient hearts filling the page
         }
 
         run();
