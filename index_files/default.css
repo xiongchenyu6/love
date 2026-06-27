@@ -117,87 +117,90 @@ a:hover {
   vertical-align: baseline;
 }
 
+/* ── Mobile: vertical stack — canvas hero on top, letter + clock below ── */
 @media (max-width: 720px) {
   body {
-    min-height: 100%;
     overflow-x: hidden;
     font-size: 15px;
   }
 
+  /* Override the inline transform/height JS applies for desktop scaling */
   #main {
-    min-height: 100svh;
-    overflow: hidden;
+    width: 100%;
+    height: auto !important;
+    overflow: visible !important;
   }
 
   #wrap {
     width: 100%;
-    min-height: 100svh;
     height: auto;
     margin: 0;
-    padding: min(420px, 84vw) 18px 32px;
+    padding: 0 0 36px;
     box-sizing: border-box;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: none !important;
+    /* The post-bloom tree snapshot (set inline by JS) is pinned full-bleed
+       to the top so it lines up exactly with the hero-banner canvas. */
+    background-repeat: no-repeat !important;
+    background-position: top center !important;
+    background-size: 100% auto !important;
   }
 
+  /* Canvas becomes the full-bleed top hero banner regardless of DOM order */
   #canvas {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 135vw;
-    max-width: 760px;
+    order: -1;
+    position: static;
+    width: 100%;
+    max-width: 100%;
     height: auto;
     aspect-ratio: 1100 / 680;
-    margin: 0;
-    transform: translateX(-50%);
+    margin: 0 0 14px;
+    transform: none;
   }
 
   #text {
-    position: relative;
-    z-index: 2;
+    position: static;
     left: auto;
     top: auto;
-    width: min(100%, 520px);
+    width: 100%;
     height: auto;
-    min-height: clamp(460px, 132vw, 620px);
-    margin: 0 auto;
+    margin: 0;
+    padding: 0 18px;
+    box-sizing: border-box;
   }
 
   #code {
     font-size: 15px;
-    line-height: 1.7;
+    line-height: 1.85;
     overflow-wrap: break-word;
   }
 
   #clock-box {
-    position: relative;
-    z-index: 2;
+    position: static;
     left: auto;
     top: auto;
-    width: min(100%, 520px);
-    margin: 24px auto 0;
-    font-size: 15px;
-    line-height: 1.6;
+    width: 100%;
+    margin: 20px 0 0;
+    padding: 0 18px;
+    box-sizing: border-box;
+    font-size: 16px;
+    line-height: 1.7;
+    text-align: center;
   }
 
-  #clock-box a {
-    font-size: inherit;
-  }
+  #clock-box a { font-size: inherit; }
 
   #clock {
     margin-left: 0;
-    margin-top: 4px;
-    line-height: 1.9;
+    margin-top: 6px;
+    line-height: 1.6;
   }
 
   #clock .digit {
-    font-size: clamp(26px, 9vw, 42px);
+    font-size: clamp(30px, 11vw, 48px);
   }
 
-  .say {
-    margin-left: 0;
-  }
-
-  .space {
-    margin-right: 0;
-  }
+  .say   { margin-left: 0; }
+  .space { margin-right: 0; }
 }

@@ -5,13 +5,7 @@
 		<title>宝宝猪 happy everday  ---Your Forever Friends Freeman</title>
 	    
         <link type="text/css" rel="stylesheet" href="./index_files/default.css">
-		<script type="text/javascript" src="./index_files/jquery.min.js"></script>
-		<script type="text/javascript" src="./index_files/jscex.min.js"></script>
-		<script type="text/javascript" src="./index_files/jscex-parser.js"></script>
-		<script type="text/javascript" src="./index_files/jscex-jit.js"></script>
-		<script type="text/javascript" src="./index_files/jscex-builderbase.min.js"></script>
-		<script type="text/javascript" src="./index_files/jscex-async.min.js"></script>
-		<script type="text/javascript" src="./index_files/jscex-async-powerpack.min.js"></script>
+		<script type="text/javascript" src="./index_files/anime.min.js"></script>
 		<script type="text/javascript" src="./index_files/functions.js" charset="utf-8"></script>
 		<script type="text/javascript" src="./index_files/love.js" charset="utf-8"></script>
 	    <style type="text/css">
@@ -31,7 +25,7 @@
 			        <div id="code">
 			      <font color="#e84a6f">  	<span class="say">* Our story</span><br>
 						<span class="say"> </span><br>
-<span class="say">* The time we share together</span><br>
+<span class="say">* The time we share together ❤</span><br>
 						<span class="say"> </span><br>
 <span class="say">*  We meet each other and start to know each other,is it fate?</span><br>
 						<span class="say"> </span><br>
@@ -42,7 +36,7 @@
 						<span class="say"> </span><br>
 			        	<span class="say">* No matter how long time goes by,I will be with you</span><br>
 						<span class="say"> </span><br>
-<span class="say">* Happness,laughter,thurow,tears, I will smeile when you feel happy,and a relieable sholder when you feel sad,what ever there always a man stand behind </span><br>
+			        	<span class="say">* Happness,laughter,thurow,tears… I will smeile when you feel happy,and a relieable sholder when you feel sad,what ever there always a man stand behind </span><br>
 						<span class="say"> </span><br>
 						<span class="say">* No need to afraid in your hardness time,cause I was there</span><br>
 						<span class="say"> </span><br>
@@ -66,23 +60,23 @@
         </div>
     
     <script>
-    </script>
+    (function () {
+        "use strict";
 
-    <script>
-    (function(){
-        var canvas = $('#canvas');
-        var canvasElement = canvas[0];
-		
-        if (!canvasElement.getContext) {
-            $("#error").show();
-            return false;
+        var canvas = document.getElementById('canvas');
+        if (!canvas || !canvas.getContext) {
+            var err = document.getElementById('error');
+            if (err) { err.style.display = 'block'; }
+            return;
         }
 
-        var width = canvasElement.width || canvas.width();
-        var height = canvasElement.height || canvas.height();
-        
-        canvas.attr("width", width);
-        canvas.attr("height", height);
+        // Logical art size (the tree coordinates are authored against this).
+        var width = canvas.width;   // 1100
+        var height = canvas.height; // 680
+
+        var sleep = function (ms) {
+            return new Promise(function (resolve) { setTimeout(resolve, ms); });
+        };
 
         var opts = {
             seed: {
@@ -106,122 +100,144 @@
                     [546, 357, 608, 252, 678, 221, 6, 100, [
                         [590, 293, 646, 277, 648, 271, 2, 80]
                     ]]
-                ]] 
+                ]]
             ],
             bloom: {
                 num: 700,
                 width: 1080,
-                height: 650,
+                height: 650
             },
             footer: {
                 width: 1200,
                 height: 5,
-                speed: 10,
+                speed: 10
             }
-        }
+        };
 
-        var tree = new Tree(canvas[0], width, height, opts);
+        var tree = new Tree(canvas, width, height, opts);
         var seed = tree.seed;
         var foot = tree.footer;
         var hold = 1;
 
-        canvas.click(function(e) {
-            var offset = canvas.offset(), displayWidth = canvas.width(), displayHeight = canvas.height(), x, y;
-            x = (e.pageX - offset.left) * width / displayWidth;
-            y = (e.pageY - offset.top) * height / displayHeight;
-            if (seed.hover(x, y)) {
-                hold = 0; 
-                canvas.unbind("click");
-                canvas.unbind("mousemove");
-                canvas.removeClass('hand');
-            }
-        }).mousemove(function(e){
-            var offset = canvas.offset(), displayWidth = canvas.width(), displayHeight = canvas.height(), x, y;
-            x = (e.pageX - offset.left) * width / displayWidth;
-            y = (e.pageY - offset.top) * height / displayHeight;
-            canvas.toggleClass('hand', seed.hover(x, y));
-        });
+        // Map a pointer/touch position to logical canvas coordinates,
+        // accounting for any CSS scaling (responsive fit, retina, etc).
+        function toCanvas(clientX, clientY) {
+            var rect = canvas.getBoundingClientRect();
+            return {
+                x: (clientX - rect.left) * (width / rect.width),
+                y: (clientY - rect.top) * (height / rect.height)
+            };
+        }
 
-        var seedAnimate = eval(Jscex.compile("async", function () {
+        function pickSeed(clientX, clientY) {
+            var p = toCanvas(clientX, clientY);
+            if (seed.hover(p.x, p.y)) {
+                hold = 0;
+                canvas.removeEventListener('click', onClick);
+                canvas.removeEventListener('mousemove', onMove);
+                canvas.removeEventListener('touchstart', onTouch);
+                canvas.classList.remove('hand');
+            }
+        }
+
+        function onClick(e) { pickSeed(e.clientX, e.clientY); }
+        function onMove(e) {
+            var p = toCanvas(e.clientX, e.clientY);
+            canvas.classList.toggle('hand', seed.hover(p.x, p.y));
+        }
+        function onTouch(e) {
+            var t = e.changedTouches[0];
+            if (t) { e.preventDefault(); pickSeed(t.clientX, t.clientY); }
+        }
+
+        canvas.addEventListener('click', onClick);
+        canvas.addEventListener('mousemove', onMove);
+        canvas.addEventListener('touchstart', onTouch, { passive: false });
+
+        // ── Animation phases (native async/await) ──────────────
+        async function seedAnimate() {
             seed.draw();
-            while (hold) {
-                $await(Jscex.Async.sleep(10));
-            }
-            while (seed.canScale()) {
-                seed.scale(0.95);
-                $await(Jscex.Async.sleep(10));
-            }
-            while (seed.canMove()) {
-                seed.move(0, 2);
-                foot.draw();
-                $await(Jscex.Async.sleep(10));
-            }
-        }));
+            while (hold) { await sleep(10); }
+            while (seed.canScale()) { seed.scale(0.95); await sleep(10); }
+            while (seed.canMove()) { seed.move(0, 2); foot.draw(); await sleep(10); }
+        }
 
-        var growAnimate = eval(Jscex.compile("async", function () {
-            do {
-    	        tree.grow();
-                $await(Jscex.Async.sleep(10));
-            } while (tree.canGrow());
-        }));
+        async function growAnimate() {
+            do { tree.grow(); await sleep(10); } while (tree.canGrow());
+        }
 
-        var flowAnimate = eval(Jscex.compile("async", function () {
-            do {
-    	        tree.flower(2);
-                $await(Jscex.Async.sleep(10));
-            } while (tree.canFlower());
-        }));
+        async function flowAnimate() {
+            do { tree.flower(2); await sleep(10); } while (tree.canFlower());
+        }
 
-        var moveAnimate = eval(Jscex.compile("async", function () {
+        async function moveAnimate() {
             tree.snapshot("p1", 240, 0, 610, 680);
-            while (tree.move("p1", 500, 0)) {
-                foot.draw();
-                $await(Jscex.Async.sleep(10));
-            }
+            while (tree.move("p1", 500, 0)) { foot.draw(); await sleep(10); }
             foot.draw();
             tree.snapshot("p2", 500, 0, 610, 680);
 
-            // ??????????, (>?<)
-            canvas.parent().css("background", "url(" + tree.toDataURL('image/png') + ")");
-            canvas.css("background", "#ffe");
-            $await(Jscex.Async.sleep(300));
-            canvas.css("background", "none");
-        }));
+            // Freeze the rendered tree as the page background, then fade
+            // the live canvas back in for the floating-petal phase. Set the
+            // image via discrete properties so the responsive stylesheet can
+            // scale/position it to match the (possibly scaled) canvas.
+            var wrap = canvas.parentNode;
+            wrap.style.backgroundImage = "url(" + tree.toDataURL('image/png') + ")";
+            wrap.style.backgroundRepeat = "no-repeat";
+            wrap.style.backgroundPosition = "top center";
+            canvas.style.background = "#ffe";
+            await sleep(300);
+            canvas.style.background = "none";
+        }
 
-        var jumpAnimate = eval(Jscex.compile("async", function () {
-            var ctx = tree.ctx;
-            while (true) {
-                tree.ctx.clearRect(0, 0, width, height);
-                tree.jump();
-                foot.draw();
-                $await(Jscex.Async.sleep(25));
+        // Floating petals — driven by requestAnimationFrame, throttled to
+        // the original ~25ms cadence so petal speed is unchanged. Pauses
+        // automatically when the tab is hidden.
+        function jumpAnimate() {
+            var last = 0;
+            function frame(now) {
+                if (now - last >= 25) {
+                    last = now;
+                    tree.ctx.clearRect(0, 0, width, height);
+                    tree.jump();
+                    foot.draw();
+                }
+                requestAnimationFrame(frame);
             }
-        }));
+            requestAnimationFrame(frame);
+        }
 
-        var textAnimate = eval(Jscex.compile("async", function () {
-		    var strs = "2023-12-9 00:00:00";
-				var nowTime=new Date();
-				var together = new Date(strs.replace(/-/g,"/"));
-
-		    $("#code").show().typewriter();
-            $("#clock-box").fadeIn(500);
-            while (true) {
-                timeElapse(together);
-                $await(Jscex.Async.sleep(1000));
+        function fadeIn(el, extra) {
+            el.style.display = 'block';
+            if (window.anime) {
+                anime(Object.assign({
+                    targets: el, opacity: [0, 1], duration: 700, easing: 'easeOutQuad'
+                }, extra || {}));
+            } else {
+                el.style.opacity = 1;
             }
-        }));
+        }
 
-        var runAsync = eval(Jscex.compile("async", function () {
-            $await(seedAnimate());
-            $await(growAnimate());
-            $await(flowAnimate());
-            $await(moveAnimate());
+        async function textAnimate() {
+            var together = new Date("2023/12/9 00:00:00");
+            var code = document.getElementById('code');
+            fadeIn(code);
+            await typewriter(code, { speed: 75 });
 
-            textAnimate().start();
+            var clockBox = document.getElementById('clock-box');
+            fadeIn(clockBox, { translateY: [12, 0], duration: 600 });
+            timeElapse(together);
+            setInterval(function () { timeElapse(together); }, 1000);
+        }
 
-            $await(jumpAnimate());
-        }));
+        async function run() {
+            await seedAnimate();
+            await growAnimate();
+            await flowAnimate();
+            await moveAnimate();
+            textAnimate();   // typewriter + clock (self-driving)
+            jumpAnimate();   // endless floating petals
+        }
 
-        runAsync().start();
+        run();
     })();
     </script></body></html>
