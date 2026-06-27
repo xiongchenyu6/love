@@ -158,6 +158,10 @@
         async function seedAnimate() {
             seed.draw();
             while (hold) { await sleep(10); }
+            // The seed's own clear() is too small to erase its "click here"
+            // hint text, leaving a stray fragment behind — wipe the whole
+            // canvas on click so the seed shrinks away cleanly.
+            tree.ctx.clearRect(0, 0, width, height);
             while (seed.canScale()) { seed.scale(0.95); await sleep(10); }
             while (seed.canMove()) { seed.move(0, 2); foot.draw(); await sleep(10); }
         }
